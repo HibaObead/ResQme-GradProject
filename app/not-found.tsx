@@ -1,16 +1,9 @@
-import { useLocation } from "react-router-dom";
-import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Truck, Home } from "lucide-react";
+import Link from "next/link";
 
-const NotFound = () => {
-    const location = useLocation();
-
-    useEffect(() => {
-        console.error("404 Error: User attempted to access non-existent route:", location.pathname);
-    }, [location.pathname]);
-
+export default function NotFound() {
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/5 p-2 sm:p-4">
             <div className="w-full max-w-md space-y-4 sm:space-y-6">
@@ -35,18 +28,15 @@ const NotFound = () => {
                     </CardHeader>
 
                     <CardContent className="px-4 sm:px-6">
-                        <Button
-                            onClick={() => window.location.href = "/"}
-                            className="w-full bg-gradient-to-r from-primary to-primary-hover hover:shadow-lg transition-all duration-300 text-sm sm:text-base"
-                        >
-                            <Home className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2" />
-                            العودة للصفحة الرئيسية
-                        </Button>
+                        <Link href="/">
+                            <Button className="w-full bg-gradient-to-r from-primary to-primary-hover hover:shadow-lg transition-all duration-300 text-sm sm:text-base">
+                                <Home className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2" />
+                                العودة للصفحة الرئيسية
+                            </Button>
+                        </Link>
                     </CardContent>
                 </Card>
             </div>
         </div>
     );
-};
-
-export default NotFound;
+}

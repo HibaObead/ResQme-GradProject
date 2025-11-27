@@ -6,6 +6,7 @@ import { ModeToggle } from "@/components/mode-toggle";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
+import Link from "next/link";
 
 const Index = () => {
   // const router = useRouter();
@@ -112,10 +113,11 @@ const Index = () => {
              hover:bg-muted transition-all duration-300"
             >
               <LogOut className="h-6 w-6 mr-3 text-white font-bold group-hover:text-amber-500 transition-colors duration-300" />
-              <span className="group-hover:text-amber-500 transition-colors duration-300">
+              <  Link href="../registration/login"
+                className="group-hover:text-amber-500 transition-colors duration-300">
                 تسجيل الدخول
-              </span>
-            </Button>
+              </Link>
+            </Button >
           </div>
 
           {/* Stats Section */}

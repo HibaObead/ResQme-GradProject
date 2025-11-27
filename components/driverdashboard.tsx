@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import Image from "next/image";
 import {
-    Truck,
     LogOut,
     MapPin,
     Phone,
@@ -134,17 +134,6 @@ export const DriverDashboard = ({ driver, onLogout }: DriverDashboardProps) => {
     const handleNavigate = (location: string, patientName: string) => {
         setSelectedLocation({ location, patientName });
     };
-
-    const getPriorityColor = (priority: string) => {
-        switch (priority) {
-            case "critical": return "bg-emergency text-emergency-foreground";
-            case "high": return "bg-destructive text-destructive-foreground";
-            case "medium": return "bg-warning text-warning-foreground";
-            case "low": return "bg-success text-success-foreground";
-            default: return "bg-muted text-muted-foreground";
-        }
-    };
-
     const getPriorityText = (priority: string) => {
         switch (priority) {
             case "critical": return "حرجة";
@@ -168,11 +157,13 @@ export const DriverDashboard = ({ driver, onLogout }: DriverDashboardProps) => {
                 <div className="container mx-auto px-2 sm:px-4 py-3 sm:py-4">
                     <div className="flex items-center justify-between flex-wrap gap-2">
                         <div className="flex items-center gap-2 sm:gap-3">
-                            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-primary to-primary-hover rounded-full flex items-center justify-center">
-                                <Truck className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground" />
+                            <div className="w-8 h-8 sm:w-10 sm:h-10  flex items-center justify-center">
+                                <Image src="/ambulance.svg" alt="Logo" width={40} height={40} />
                             </div>
-                            <div>
-                                <h1 className="font-bold text-base sm:text-lg">ResQme</h1>
+                            <div >
+                                <h1 className="text-xl sm:text-2xl lg:text-[30px] font-semibold text-[#00D492] dark:text-[#00D492]">
+                                    ResQ Me
+                                </h1>
                                 <p className="text-xs sm:text-sm text-muted-foreground">لوحة تحكم السائق</p>
                             </div>
                         </div>
@@ -212,70 +203,98 @@ export const DriverDashboard = ({ driver, onLogout }: DriverDashboardProps) => {
                         <div className="flex items-center justify-between flex-wrap gap-2">
                             <div className="flex-1 min-w-0">
                                 <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                                    <Circle className={`w-3 h-3 sm:w-4 sm:h-4 ${driverStatus === "on-duty" ? "text-success fill-success" : "text-muted-foreground"}`} />
+                                    <Circle
+                                        className={`w-3 h-3 sm:w-4 sm:h-4 ${driverStatus === "on-duty"
+                                            ? "text-red-500 fill-red-500"
+                                            : "text-green-500 fill-green-500"
+                                            }`}
+                                    />
                                     حالة السائق
                                 </CardTitle>
                                 <CardDescription className="text-xs sm:text-sm">
-                                    {driverStatus === "on-duty" ? "أنت في الخدمة حالياً" : "أنت متاح للاستدعاء"}
+                                    {driverStatus === "on-duty"
+                                        ? "أنت في الخدمة حالياً"
+                                        : "أنت متاح للاستدعاء"}
                                 </CardDescription>
                             </div>
 
                             <Badge
                                 variant={driverStatus === "on-duty" ? "default" : "secondary"}
-                                className={`text-xs ${driverStatus === "on-duty" ? "bg-success text-success-foreground" : ""}`}
+                                className={`text-xs ${driverStatus === "on-duty"
+                                    ? "bg-red-500 text-white"
+                                    : "bg-green-500 text-white"
+                                    }`}
                             >
                                 {driverStatus === "on-duty" ? "في الخدمة" : "متاح"}
                             </Badge>
                         </div>
                     </CardHeader>
 
+
                     <CardContent className="pt-0">
                         <Button
                             onClick={handleStatusChange}
-                            className={`w-full text-sm sm:text-base ${driverStatus === "available"
-                                ? "bg-gradient-to-r from-success to-success/90 hover:shadow-lg"
-                                : "bg-gradient-to-r from-muted to-muted/90 hover:shadow-lg text-muted-foreground"
+                            className={`w-full text-sm sm:text-base font-medium transition-all duration-300 rounded-lg shadow-md ${driverStatus === "available"
+                                ? "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white"
+                                : "bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white"
                                 }`}
                         >
                             {driverStatus === "available" ? "بدء الخدمة" : "إنهاء الخدمة"}
                         </Button>
                     </CardContent>
+
                 </Card>
 
-                <div className="space-y-3 sm:space-y-4">
+                < div className="space-y-3 sm:space-y-4">
                     <div className="flex items-center justify-between flex-wrap gap-2">
                         <h2 className="text-lg sm:text-xl font-bold flex items-center gap-2">
-                            <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-emergency" />
+                            <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-red-500" />
                             طلبات الإسعاف
                         </h2>
-                        <Badge variant="secondary" className="bg-primary/10 text-primary text-xs">
+
+                        <Badge
+                            variant="secondary"
+                            className="bg-red-100 text-red-600 border border-red-200 text-xs px-3 py-1 rounded-full"
+                        >
                             {requests.filter(r => r.status === "pending").length} طلب جديد
                         </Badge>
                     </div>
 
+
                     <div className="grid gap-3 sm:gap-4">
                         {requests.map((request) => (
-                            <Card key={request.id} className="shadow-md border-l-4 border-l-emergency hover:shadow-lg transition-shadow">
+                            <Card
+                                key={request.id}
+                                className="shadow-md border-l-4 border-l-red-500 hover:shadow-lg transition-shadow bg-white dark:bg-zinc-900"
+                            >
                                 <CardHeader className="pb-2 sm:pb-3">
                                     <div className="flex items-start justify-between flex-wrap gap-2">
                                         <div className="space-y-1 flex-1 min-w-0">
                                             <CardTitle className="text-base sm:text-lg flex items-center gap-2">
-                                                <User className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                                                <User className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500" />
                                                 <span className="truncate">{request.patientName}</span>
                                             </CardTitle>
                                             <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
-                                                <Clock className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                                                <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-amber-500" />
                                                 {request.timestamp}
                                             </div>
                                         </div>
 
                                         <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
-                                            <Badge className={`${getPriorityColor(request.priority)} text-xs`}>
+                                            <Badge
+                                                className={`text-xs ${request.priority === "high"
+                                                    ? "bg-red-100 text-red-700"
+                                                    : request.priority === "medium"
+                                                        ? "bg-amber-100 text-amber-700"
+                                                        : "bg-green-100 text-green-700"
+                                                    }`}
+                                            >
                                                 {getPriorityText(request.priority)}
                                             </Badge>
+
                                             {request.status === "accepted" && (
-                                                <Badge className="bg-success text-success-foreground text-xs">
-                                                    <CheckCircle className="w-2 h-2 sm:w-3 sm:h-3 ml-1" />
+                                                <Badge className="bg-green-100 text-green-700 text-xs border border-green-300">
+                                                    <CheckCircle className="w-3 h-3 ml-1" />
                                                     مقبول
                                                 </Badge>
                                             )}
@@ -286,17 +305,17 @@ export const DriverDashboard = ({ driver, onLogout }: DriverDashboardProps) => {
                                 <CardContent className="space-y-3 sm:space-y-4 pt-2 sm:pt-4">
                                     <div className="space-y-2">
                                         <div className="flex items-start gap-2">
-                                            <MapPin className="w-3 h-3 sm:w-4 sm:h-4 text-primary mt-1 flex-shrink-0" />
+                                            <MapPin className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500 mt-1 flex-shrink-0" />
                                             <span className="text-xs sm:text-sm break-words">{request.location}</span>
                                         </div>
 
                                         <div className="flex items-start gap-2">
-                                            <AlertTriangle className="w-3 h-3 sm:w-4 sm:h-4 text-warning mt-1 flex-shrink-0" />
+                                            <AlertTriangle className="w-3 h-3 sm:w-4 sm:h-4 text-amber-500 mt-1 flex-shrink-0" />
                                             <span className="text-xs sm:text-sm">{request.description}</span>
                                         </div>
 
                                         <div className="flex items-center gap-2">
-                                            <Phone className="w-3 h-3 sm:w-4 sm:h-4 text-success flex-shrink-0" />
+                                            <Phone className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 flex-shrink-0" />
                                             <span className="text-xs sm:text-sm font-mono">{request.phoneNumber}</span>
                                         </div>
                                     </div>
@@ -307,7 +326,7 @@ export const DriverDashboard = ({ driver, onLogout }: DriverDashboardProps) => {
                                             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                                                 <Button
                                                     onClick={() => handleAcceptRequest(request.id)}
-                                                    className="flex-1 bg-gradient-to-r from-success to-success/90 hover:shadow-lg text-xs sm:text-sm"
+                                                    className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white text-xs sm:text-sm shadow-md"
                                                     disabled={hasAcceptedRequest}
                                                 >
                                                     <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2" />
@@ -316,7 +335,7 @@ export const DriverDashboard = ({ driver, onLogout }: DriverDashboardProps) => {
 
                                                 <Button
                                                     variant="outline"
-                                                    className="flex items-center gap-1 sm:gap-2 sm:min-w-[100px] text-xs sm:text-sm"
+                                                    className="flex items-center gap-1 sm:gap-2 sm:min-w-[100px] text-xs sm:text-sm border-blue-500 text-blue-600 hover:bg-blue-50"
                                                     onClick={() => handleNavigate(request.location, request.patientName)}
                                                 >
                                                     <Navigation className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -331,7 +350,7 @@ export const DriverDashboard = ({ driver, onLogout }: DriverDashboardProps) => {
                                             <Separator />
                                             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                                                 <Button
-                                                    className="flex-1 bg-gradient-to-r from-primary to-primary-hover text-xs sm:text-sm"
+                                                    className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white text-xs sm:text-sm"
                                                     onClick={() => handleNavigate(request.location, request.patientName)}
                                                 >
                                                     <Navigation className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2" />
@@ -340,7 +359,7 @@ export const DriverDashboard = ({ driver, onLogout }: DriverDashboardProps) => {
 
                                                 <Button
                                                     variant="outline"
-                                                    className="sm:min-w-[100px] text-xs sm:text-sm"
+                                                    className="sm:min-w-[100px] text-xs sm:text-sm border-green-500 text-green-600 hover:bg-green-50"
                                                     onClick={() => window.open(`tel:${request.phoneNumber}`)}
                                                 >
                                                     <Phone className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2" />
@@ -349,7 +368,7 @@ export const DriverDashboard = ({ driver, onLogout }: DriverDashboardProps) => {
 
                                                 <Button
                                                     variant="outline"
-                                                    className="sm:min-w-[100px] text-xs sm:text-sm bg-success/10 hover:bg-success/20 border-success text-success"
+                                                    className="sm:min-w-[100px] text-xs sm:text-sm bg-green-100 hover:bg-green-200 border-green-500 text-green-700"
                                                     onClick={() => handleCompleteRequest(request.id)}
                                                 >
                                                     <CheckCheck className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2" />
@@ -360,7 +379,7 @@ export const DriverDashboard = ({ driver, onLogout }: DriverDashboardProps) => {
                                     )}
 
                                     {driverStatus === "available" && (
-                                        <div className="bg-muted/50 rounded-lg p-2 sm:p-3">
+                                        <div className="bg-gray-100 dark:bg-zinc-800 rounded-lg p-2 sm:p-3">
                                             <p className="text-xs sm:text-sm text-muted-foreground text-center">
                                                 يجب أن تكون في الخدمة لقبول الطلبات
                                             </p>
@@ -370,6 +389,7 @@ export const DriverDashboard = ({ driver, onLogout }: DriverDashboardProps) => {
                             </Card>
                         ))}
                     </div>
+
                 </div>
             </div>
         </div>

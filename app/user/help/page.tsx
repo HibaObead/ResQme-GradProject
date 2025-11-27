@@ -14,6 +14,7 @@ import { User, LogOut } from "lucide-react";
 import Image from "next/image";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function HelpPage() {
     const faqs = [
@@ -47,8 +48,10 @@ export default function HelpPage() {
                     {/* Left side: Logo + App Name */}
                     <div className="flex items-center gap-2">
                         <Image src="/ambulance.svg" alt="Logo" width={40} height={40} />
-                        <h1 className="text-xl sm:text-2xl lg:text-[30px] font-semibold text-[#00D492] dark:text-[#00D492]">
-                            ResQ Me
+                        <h1 className="text-xl sm:text-2xl lg:text-[30px] font-semibold text-[#00D492]">
+                            <Link href="/user/ambulance">
+                                ResQ Me
+                            </Link>
                         </h1>
                     </div>
 

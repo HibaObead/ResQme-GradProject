@@ -16,50 +16,82 @@ import { User, LogOut } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ModeToggle } from "@/components/mode-toggle";
+
 export default function SettingsPage() {
     const [settings, setSettings] = useState({
-        phone: "",
         currentPassword: "",
         newPassword: "",
         confirmPassword: "",
     });
+
+    const [message, setMessage] = useState("");
+    const router = useRouter();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setSettings({ ...settings, [name]: value });
     };
 
-    const handleSave = () => {
-        if (!settings.phone || !settings.currentPassword || !settings.newPassword || !settings.confirmPassword) {
-            alert("⚠️ الرجاء تعبئة جميع الحقول");
+    const handleSave = async () => {
+        setMessage("");
+        if (!settings.currentPassword || !settings.newPassword || !settings.confirmPassword) {
+            setMessage("⚠️ الرجاء تعبئة جميع الحقول");
             return;
         }
         if (settings.newPassword !== settings.confirmPassword) {
-            alert("❌ كلمة المرور الجديدة غير مطابقة للتأكيد");
+            setMessage("❌ كلمة المرور الجديدة غير مطابقة للتأكيد");
             return;
         }
-        // هنا تحط API call للحفظ
-        alert("✅ تم تحديث رقم الهاتف وكلمة المرور بنجاح!");
-        console.log("Saved settings:", settings);
+
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+            setMessage("❌ يجب تسجيل الدخول أولاً");
+            return;
+        }
+
+        try {
+            const response = await fetch("https://resqme.runasp.net/api/Identity/Accounts/change-password", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    currentPassword: settings.currentPassword,
+                    newPassword: settings.newPassword
+                })
+            });
+
+            if (response.ok) {
+                setMessage("✅ تم تحديث كلمة المرور بنجاح");
+                setSettings({ currentPassword: "", newPassword: "", confirmPassword: "" });
+            } else {
+                const errorData = await response.json();
+                setMessage(errorData?.message || "❌ حدث خطأ أثناء تحديث كلمة المرور");
+            }
+        } catch (error) {
+            console.error(error);
+            setMessage("❌ تعذر الاتصال بالخادم");
+        }
     };
-    const router = useRouter();
+
+    const handleLogout = () => {
+        localStorage.removeItem("authToken");
+        router.push("/login");
+    };
 
     return (
         <div className=" bg-gray-100 dark:bg-gray-950 transition-colors duration-300 min-h-screen">
             {/* NavBar */}
             <div className="sticky top-0 z-50 bg-white dark:bg-black shadow">
                 <div className="max-w-7xl mx-auto flex justify-between items-center px-4 sm:px-6 lg:px-20 py-4">
-                    {/* Left side: Logo + App Name */}
                     <div className="flex items-center gap-2">
                         <Image src="/ambulance.svg" alt="Logo" width={40} height={40} />
-                        <h1 className="text-xl sm:text-2xl lg:text-[30px] font-semibold text-[#00D492] dark:text-[#00D492]">
+                        <h1 className="text-xl sm:text-2xl lg:text-[30px] font-semibold text-[#00D492]">
                             ResQ Me
                         </h1>
                     </div>
-
-                    {/* Right side: User Menu + Mode toggle */}
                     <div className="flex items-center gap-2 sm:gap-4">
-                        {/* User Menu */}
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="ghost" size="sm" className="gap-2 cursor-pointer">
@@ -73,41 +105,23 @@ export default function SettingsPage() {
                                 <DropdownMenuItem onClick={() => router.push("/user/settings")}>الإعدادات</DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => router.push("/user/help")}>المساعدة</DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem className="text-destructive">
+                                <DropdownMenuItem className="text-destructive" onClick={handleLogout}>
                                     تسجيل الخروج
                                     <LogOut className="h-4 w-4 mr-2" />
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
-
-                        {/* Dark/Light Mode Toggle */}
                         <ModeToggle />
                     </div>
                 </div>
             </div>
-            <div dir="rtl" className="max-w-4xl mx-auto p-6 space-y-6">
 
+            <div dir="rtl" className="max-w-4xl mx-auto p-6 space-y-6">
                 <Card className="shadow-lg">
                     <CardHeader className="bg-gradient-to-r from-[#74d5b6] to-[#34e8b8] text-white p-6">
-                        <CardTitle className="text-xl">
-                            إعدادات الحساب
-                        </CardTitle>
+                        <CardTitle className="text-xl">إعدادات الحساب</CardTitle>
                     </CardHeader>
-
                     <CardContent className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4 text-right">
-                        {/* رقم الموبايل */}
-                        <div className="md:col-span-2">
-                            <Label className="mb-2 px-2"> البريد الإلكتروني</Label>
-                            <Input
-                                name="phone"
-                                placeholder="xxx@gmail.com"
-                                value={settings.phone}
-                                onChange={handleChange}
-                                className="text-right placeholder:text-right"
-                            />
-                        </div>
-
-                        {/* كلمة المرور الحالية */}
                         <div className="md:col-span-2">
                             <Label className="mb-2 px-2">كلمة المرور الحالية</Label>
                             <Input
@@ -119,8 +133,6 @@ export default function SettingsPage() {
                                 className="text-right placeholder:text-right"
                             />
                         </div>
-
-                        {/* كلمة المرور الجديدة */}
                         <div className="md:col-span-2">
                             <Label className="mb-2 px-2">كلمة المرور الجديدة</Label>
                             <Input
@@ -132,8 +144,6 @@ export default function SettingsPage() {
                                 className="text-right placeholder:text-right"
                             />
                         </div>
-
-                        {/* تأكيد كلمة المرور الجديدة */}
                         <div className="md:col-span-2">
                             <Label className="mb-2 px-2">تأكيد كلمة المرور الجديدة</Label>
                             <Input
@@ -148,7 +158,8 @@ export default function SettingsPage() {
                     </CardContent>
                 </Card>
 
-                {/* زر الحفظ */}
+                {message && <p className="text-center text-red-500">{message}</p>}
+
                 <div className="text-center">
                     <Button
                         className="bg-[#00D492] hover:bg-[#009f75] text-lg px-10 py-3 rounded-full shadow-md"
@@ -159,6 +170,5 @@ export default function SettingsPage() {
                 </div>
             </div>
         </div>
-
     );
 }
